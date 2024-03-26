@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+// Adapted from https://github.com/PimDeWitte/UnityMainThreadDispatcher/blob/master/Runtime/UnityMainThreadDispatcher.cs and refactored through ChatGPT
 public class UnityMainThreadDispatcher : MonoBehaviour
 {
     private readonly Queue<Action> queue = new Queue<Action>();
