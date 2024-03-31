@@ -12,7 +12,7 @@ def detect_landmarks(frame, holistic):
     Process the image with MediaPipe Holistic to detect landmarks.
     Returns the results which contain landmarks and image in RGB. 
     """
-    image_rgb.flags.writeable = False   
+    frame.flags.writeable = False   
     image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     # Process the image and detect landmarks
