@@ -10,6 +10,8 @@ public class RespondToSignals : MonoBehaviour
     public enum EyePosition { normal, happy, angry, dead }
     public EyePosition eyeState;
 
+    private Vector3 originalPosition;
+
     // Boolean used for development purposes 
     public bool useTcpConnection = true;
 
@@ -18,6 +20,9 @@ public class RespondToSignals : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         characterMaterials = GetComponentsInChildren<Renderer>();
+
+        originalPosition = transform.position;
+
     }
 
     // Update is called once per frame
@@ -29,6 +34,8 @@ public class RespondToSignals : MonoBehaviour
             {
                 ChangeEyeOffset(EyePosition.normal);
                 ChangeAnimatorIdle("idle");
+                ResetOrientation();
+                ResetPosition();
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
@@ -67,6 +74,11 @@ public class RespondToSignals : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Alpha9))
             {
+                ChangeEyeOffset(EyePosition.happy);
+                ChangeAnimatorIdle("excited");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
                 ChangeEyeOffset(EyePosition.normal);
                 ChangeAnimatorIdle("think");
             }
@@ -94,15 +106,19 @@ public class RespondToSignals : MonoBehaviour
                     ChangeEyeOffset(EyePosition.dead);
                     ChangeAnimatorIdle("head_shake");
                     break;
-                case "excitement":
+                case "celebratory":
                     ChangeEyeOffset(EyePosition.happy);
-                    ChangeAnimatorIdle("clap");
+                    ChangeAnimatorIdle("excited");
                     break;
                 case "questioning":
                     ChangeEyeOffset(EyePosition.normal);
                     ChangeAnimatorIdle("shrug");
                     break;
-                case "bored":
+                case "appreciation":
+                    ChangeEyeOffset(EyePosition.happy);
+                    ChangeAnimatorIdle("clap");
+                    break;
+                case "disengagement":
                     ChangeEyeOffset(EyePosition.angry);
                     ChangeAnimatorIdle("angry");
                     break;
@@ -127,11 +143,25 @@ public class RespondToSignals : MonoBehaviour
     IEnumerator ReturnToIdle()
     {
         // Wait for a specified time before returning to idle
-        yield return new WaitForSeconds(5f); 
+        yield return new WaitForSeconds(5);
+
+        // Reset position and orientation
+        ResetOrientation();
+        ResetPosition();
 
         // Transition back to the idle state
         ChangeEyeOffset(EyePosition.normal);
         ChangeAnimatorIdle("idle");  
+    }
+
+    void ResetOrientation()
+    {
+        transform.rotation = Quaternion.Euler(new Vector3(-0.05f, 20.054f, -0.018f));
+    }
+
+    void ResetPosition()
+    {
+        transform.position = originalPosition;
     }
 
 
