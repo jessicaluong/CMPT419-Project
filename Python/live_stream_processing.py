@@ -1,64 +1,85 @@
-# Adapted from https://github.com/nicknochnack/Body-Language-Decoder/blob/main/Body%20Language%20Decoder%20Tutorial.ipynb
 import mediapipe as mp
 import cv2
+import numpy as np
+from tensorflow.keras.models import load_model
 
 # Use MediaPipe holistic model (https://github.com/google/mediapipe/blob/master/docs/solutions/holistic.md)
 mp_holistic = mp.solutions.holistic 
-# Draw detections to the screen (used for development)  
+# Draw detections to the screen 
 mp_drawing = mp.solutions.drawing_utils
+# Trained model
+model = load_model('python/model.keras')
 
-def detect_landmarks(frame, holistic):
-    """
-    Process the image with MediaPipe Holistic to detect landmarks.
-    Returns the results which contain landmarks and image in RGB. 
-    """
-    frame.flags.writeable = False   
-    image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+def prob_viz(res, actions, input_frame):
+    colors = [(245,117,16), (117,245,16), (16,117,245), (245,117,16), (117,245,16), (16,117,245), (245,117,16), (117,245,16), (16,117,245)]
+    output_frame = input_frame.copy()
+    for num, prob in enumerate(res):
+        cv2.rectangle(output_frame, (0,60+num*40), (int(prob*100), 90+num*40), colors[num], -1)
+        cv2.putText(output_frame, actions[num], (0, 85+num*40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        
+    return output_frame
 
-    # Process the image and detect landmarks
-    results = holistic.process(image_rgb)
+def extract_keypoints(results):
+    pose = np.zeros(132)
+    lh = np.zeros(21*3)
+    rh = np.zeros(21*3)
 
-    return results, image_rgb
+    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
+    lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
+    rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
     
-def display_landmarks(image_rgb, results):
+    return np.concatenate([pose, lh, rh])
+
+def detect_landmarks(image, holistic):
+    """
+    Process the image using MediaPipe Holistic to extract landmarks.
+    Returns the results which contain the landmarks and image. 
+    """
+    image.flags.writeable = False   
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    results = holistic.process(image)
+    image.flags.writeable = True
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+    return results, image
+    
+def draw_landmarks(image, results):
     """
     Draw the detected landmarks on the image.
-    Returns image in BGR. 
-    (Used for development - may be removed in the future.)
+    Adapted from https://github.com/nicknochnack/Body-Language-Decoder/blob/main/Body%20Language%20Decoder%20Tutorial.ipynb
     """
-    image_rgb.flags.writeable = True
-    image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
 
-    # 1. Draw face landmarks
-    mp_drawing.draw_landmarks(image_bgr, results.face_landmarks, mp_holistic.FACEMESH_CONTOURS, 
-                                mp_drawing.DrawingSpec(color=(80,110,10), thickness=1, circle_radius=1),
-                                mp_drawing.DrawingSpec(color=(80,256,121), thickness=1, circle_radius=1)
-                                )
-    
-    # 2. Right hand
-    mp_drawing.draw_landmarks(image_bgr, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    # Right hand
+    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
                                 mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4),
                                 mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
                                 )
 
-    # 3. Left Hand
-    mp_drawing.draw_landmarks(image_bgr, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    # Left Hand
+    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
                                 mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4),
                                 mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
                                 )
 
-    # 4. Pose Detections
-    mp_drawing.draw_landmarks(image_bgr, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS, 
+    # Pose 
+    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS, 
                                 mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4),
                                 mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
                                 )
     
-    return image_bgr
+    return image
 
 def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, use_unity):
     '''
     Capture live stream from webcam and process frames.
     '''
+    # Variables 
+    sequence = []
+    sentence = []
+    predictions = []
+    threshold = 0.5
+    actions = np.array(['raise_hand', 'thumbs_up', 'thumbs_down', 'cheer', 'cross_arms', 'clap', 'superman', 'x', 'neutral'])
+
     # Use the Holistic model
     with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
         # Opens webcam for video capturing
@@ -76,16 +97,37 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, use_
                     print("Ignoring empty camera frame.")
                     continue
 
-                # Detect landmarks
+                # Detect landmarks in frame using MediaPipe
                 results, image = detect_landmarks(frame, holistic)
 
-                # Display webcam and landmarks to the screen (used for development)
+                # Annotate frame with landmarks
+                draw_landmarks(image, results)
 
-                # Display landmarks
-                display_frame = display_landmarks(image, results)
+                # 2. Prediction logic
+                keypoints = extract_keypoints(results)
+                sequence.append(keypoints)
+                sequence = sequence[-30:]
+                
+                if len(sequence) == 30:
+                    res = model.predict(np.expand_dims(sequence, axis=0), verbose=0)[0]
+                    print(actions[np.argmax(res)])
+                    predictions.append(np.argmax(res))
+                    
+                    #3. Viz logic
+                    if np.unique(predictions[-10:])[0]==np.argmax(res): 
+                        if res[np.argmax(res)] > threshold: 
+                            
+                            if len(sentence) > 0: 
+                                if actions[np.argmax(res)] != sentence[-1]:
+                                    sentence.append(actions[np.argmax(res)])
+                            else:
+                                sentence.append(actions[np.argmax(res)])
 
-                # Show the frame with landmarks
-                cv2.imshow('Webcam with Landmarks', display_frame)
+                    if len(sentence) > 5: 
+                        sentence = sentence[-5:]
+
+                    # Viz probabilities
+                    # image = prob_viz(res, actions, image)
 
                 ###################################################################
 
@@ -106,6 +148,8 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, use_
 
                 ###################################################################
 
+                # Show the frame with landmarks
+                cv2.imshow('Webcam with Landmarks', image)
 
                 # Press 'q' or 'Escape' key to quit
                 if cv2.waitKey(1) & 0xFF in [ord('q'), 27]:
