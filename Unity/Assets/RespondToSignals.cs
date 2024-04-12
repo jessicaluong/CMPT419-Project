@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// This class is responsible for responding to different signals (either through TCP connections or keyboard inputs),
+/// changing animations and visual states of the character based on those signals.
+/// </summary>
 public class RespondToSignals : MonoBehaviour
 {
     Animator animator;
@@ -10,27 +14,129 @@ public class RespondToSignals : MonoBehaviour
     public enum EyePosition { normal, happy, angry, dead }
     public EyePosition eyeState;
 
-    private Vector3 originalPosition;
+    private Vector3 originalPosition; // Original position to reset the character to
 
-    // Boolean used for development purposes 
-    public bool useTcpConnection = true;
+    public bool useTcpConnection = true; // Flag to toggle between TCP connection and keyboard input for development purposes
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// Start is called before the first frame update. Initialize component references and set initial states.
+    /// </summary>
     public void Start()
     {
         animator = GetComponent<Animator>();
         characterMaterials = GetComponentsInChildren<Renderer>();
 
         originalPosition = transform.position;
-
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Update is called once per frame. Handles keyboard inputs to manually trigger animations and state changes.
+    /// </summary>
     void Update()
     {
         if (!useTcpConnection)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            HandleKeyboardInputs();
+        }
+    }
+
+    /// <summary>
+    /// Processes incoming signals over TCP to trigger animations and state changes.
+    /// </summary>
+    /// <param name="signal">The signal received from TCP communication.</param>
+    public void ReceiveSignal(string signal)
+    {
+        if (useTcpConnection)
+        {
+            StopCoroutine("ReturnToIdle"); // Stop any existing "ReturnToIdle" coroutine in case a new signal is received before the previous one completes
+            ProcessSignal(signal); // Process the incoming signal.
+            StartCoroutine(ReturnToIdle()); // Start the coroutine to return to the idle state after a delay
+        }
+    }
+
+    /// <summary>
+    /// Coroutine to delay before returning to the idle state, resetting position and orientation.
+    /// </summary>
+    /// <returns>IEnumerator for coroutine handling.</returns>
+    IEnumerator ReturnToIdle()
+    {
+        // Wait for a specified time before returning to idle
+        yield return new WaitForSeconds(5);
+
+        // Reset position and orientation
+        ResetOrientation();
+        ResetPosition();
+
+        // Transition back to the idle state
+        ChangeEyeOffset(EyePosition.normal);
+        ChangeAnimatorIdle("idle");  
+    }
+
+    /// <summary>
+    /// Resets the agent's orientation to a predefined rotation.
+    /// </summary>
+    void ResetOrientation()
+    {
+        transform.rotation = Quaternion.Euler(new Vector3(-0.05f, 20.054f, -0.018f));
+    }
+
+    /// <summary>
+    /// Resets the agent's position to the original location.
+    /// </summary>
+    void ResetPosition()
+    {
+        transform.position = originalPosition;
+    }
+
+    /// <summary>
+    /// Changes the animation state of the character based on the provided trigger.
+    /// </summary>
+    /// <param name="trigger">The animation trigger to set.</param>
+    void ChangeAnimatorIdle(string trigger)
+    {
+        animator.SetTrigger(trigger);
+    }
+
+    /// <summary>
+    /// Changes the texture offset of the eyes to simulate different eye positions.
+    /// </summary>
+    /// <param name="pos">The new eye position.</param>
+    void ChangeEyeOffset(EyePosition pos)
+    {
+        Vector2 offset = Vector2.zero;
+
+        switch (pos)
+        {
+            case EyePosition.normal:
+                offset = new Vector2(0, 0);
+                break;
+            case EyePosition.happy:
+                offset = new Vector2(.33f, 0);
+                break;
+            case EyePosition.angry:
+                offset = new Vector2(.66f, 0);
+                break;
+            case EyePosition.dead:
+                offset = new Vector2(.33f, .66f);
+                break;
+            default:
+                break;
+        }
+
+        for (int i = 0; i < characterMaterials.Length; i++)
+        {
+            if (characterMaterials[i].transform.CompareTag("PlayerEyes"))
+                characterMaterials[i].material.SetTextureOffset("_MainTex", offset);
+        }
+    }
+}
+
+    /// <summary>
+    /// Handles keyboard inputs for development purposes, allowing manual control over character state changes.
+    /// </summary>
+    private void HandleKeyboardInputs()
+    {
+           if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 ChangeEyeOffset(EyePosition.normal);
                 ChangeAnimatorIdle("idle");
@@ -82,120 +188,46 @@ public class RespondToSignals : MonoBehaviour
                 ChangeEyeOffset(EyePosition.normal);
                 ChangeAnimatorIdle("think");
             }
-        }
     }
 
-    public void ReceiveSignal(string signal)
+    /// <summary>
+    /// Processes the received signal to change the character's state.
+    /// </summary>
+    /// <param name="signal">The signal to process.</param>
+    private void ProcessSignal(string signal)
     {
-        if (useTcpConnection)
+        switch (signal)
         {
-            // Stop any existing "ReturnToIdle" coroutine in case a new signal is received before the previous one completes
-            StopCoroutine("ReturnToIdle");
-
-            switch (signal)
-            {
-                case "attention":
-                    ChangeEyeOffset(EyePosition.normal);
-                    ChangeAnimatorIdle("point");
-                    break;
-                case "approval":
-                    ChangeEyeOffset(EyePosition.happy);
-                    ChangeAnimatorIdle("head_nod");
-                    break;
-                case "disapproval":
-                    ChangeEyeOffset(EyePosition.dead);
-                    ChangeAnimatorIdle("head_shake");
-                    break;
-                case "celebratory":
-                    ChangeEyeOffset(EyePosition.happy);
-                    ChangeAnimatorIdle("excited");
-                    break;
-                case "questioning":
-                    ChangeEyeOffset(EyePosition.normal);
-                    ChangeAnimatorIdle("shrug");
-                    break;
-                case "appreciation":
-                    ChangeEyeOffset(EyePosition.happy);
-                    ChangeAnimatorIdle("clap");
-                    break;
-                case "disengagement":
-                    ChangeEyeOffset(EyePosition.angry);
-                    ChangeAnimatorIdle("angry");
-                    break;
-                case "greeting":
-                    ChangeEyeOffset(EyePosition.happy);
-                    ChangeAnimatorIdle("wave");
-                    break;
-                case "unknown":
-                    ChangeEyeOffset(EyePosition.normal);
-                    ChangeAnimatorIdle("think");
-                    break;
-                default:
-                    Debug.LogWarning("Unknown signal received: " + signal);
-                    break;
-            }
-
-            // Start the coroutine to return to the idle state after a delay
-            StartCoroutine(ReturnToIdle());
-        }
-    }
-
-    IEnumerator ReturnToIdle()
-    {
-        // Wait for a specified time before returning to idle
-        yield return new WaitForSeconds(5);
-
-        // Reset position and orientation
-        ResetOrientation();
-        ResetPosition();
-
-        // Transition back to the idle state
-        ChangeEyeOffset(EyePosition.normal);
-        ChangeAnimatorIdle("idle");  
-    }
-
-    void ResetOrientation()
-    {
-        transform.rotation = Quaternion.Euler(new Vector3(-0.05f, 20.054f, -0.018f));
-    }
-
-    void ResetPosition()
-    {
-        transform.position = originalPosition;
-    }
-
-
-    void ChangeAnimatorIdle(string trigger)
-    {
-        animator.SetTrigger(trigger);
-    }
-
-    void ChangeEyeOffset(EyePosition pos)
-    {
-        Vector2 offset = Vector2.zero;
-
-        switch (pos)
-        {
-            case EyePosition.normal:
-                offset = new Vector2(0, 0);
+            case "raise_hand":
+                ChangeEyeOffset(EyePosition.normal);
+                ChangeAnimatorIdle("point");
                 break;
-            case EyePosition.happy:
-                offset = new Vector2(.33f, 0);
+            case "thumbs_up":
+                ChangeEyeOffset(EyePosition.happy);
+                ChangeAnimatorIdle("head_nod");
                 break;
-            case EyePosition.angry:
-                offset = new Vector2(.66f, 0);
+            case "thumbs_down":
+                ChangeEyeOffset(EyePosition.dead);
+                ChangeAnimatorIdle("head_shake");
                 break;
-            case EyePosition.dead:
-                offset = new Vector2(.33f, .66f);
+            case "cheer":
+                ChangeEyeOffset(EyePosition.happy);
+                ChangeAnimatorIdle("excited");
+                break;
+            case "cross_arms":
+                ChangeEyeOffset(EyePosition.normal);
+                ChangeAnimatorIdle("shrug");
+                break;
+            case "clap":
+                ChangeEyeOffset(EyePosition.happy);
+                ChangeAnimatorIdle("clap");
+                break;
+            case "idle":
+                ChangeEyeOffset(EyePosition.normal);
+                ChangeAnimatorIdle("idle");
                 break;
             default:
+                Debug.LogWarning("Unknown signal received: " + signal);
                 break;
         }
-
-        for (int i = 0; i < characterMaterials.Length; i++)
-        {
-            if (characterMaterials[i].transform.CompareTag("PlayerEyes"))
-                characterMaterials[i].material.SetTextureOffset("_MainTex", offset);
-        }
     }
-}

@@ -3,6 +3,9 @@ using System.Net.Sockets;
 using System.IO;
 using System.Threading;
 
+/// <summary>
+/// Handles network communication by connecting to a server and processing incoming signals.
+/// </summary>
 public class UnityClient : MonoBehaviour
 {
     public string host = "127.0.0.1";
@@ -12,25 +15,39 @@ public class UnityClient : MonoBehaviour
     private Thread clientThread;
     public RespondToSignals signalResponder;
 
+    /// <summary>
+    /// Called when the script instance is being loaded.
+    /// Ensures that the UnityMainThreadDispatcher instance is created on the main thread.
+    /// </summary>
     private void Awake()
     {
-        // Access the Instance property to ensure it's created on the main thread
         var dispatcher = UnityMainThreadDispatcher.Instance;
     }
 
+    /// <summary>
+    /// Called on the frame when a script is enabled just before any of the Update methods are called the first time.
+    /// Starts the connection to the server.
+    /// </summary>
     void Start()
     {
         ConnectToServer(); 
     }
 
+    /// <summary>
+    /// Initiates the connection to the server by starting a new thread (to avoid blocking main thread) 
+    /// that handles the server communication.
+    /// </summary>
     void ConnectToServer()
     {
-        // Receive data in separate thread to avoid block Unity main thread 
         ThreadStart ts = new ThreadStart(GetSignal); 
         clientThread = new Thread(ts);
         clientThread.Start();
     }
 
+    /// <summary>
+    /// Connects to the server and continuously reads incoming data.
+    /// If data is available, it processes it using the main thread dispatcher.
+    /// </summary>
     private void GetSignal() 
     {
         client = new TcpClient(host, port); 
@@ -39,7 +56,7 @@ public class UnityClient : MonoBehaviour
         NetworkStream stream = client.GetStream(); 
         reader = new StreamReader(stream); 
 
-        // Read data from the server in a loop
+        // Read data continuously from the server while the connection is active
         while (client.Connected)
         {
             if (stream.DataAvailable)
@@ -47,12 +64,15 @@ public class UnityClient : MonoBehaviour
                 string data = reader.ReadLine();
                 Debug.Log("Received data: " + data);
 
-                // Use Unity's main thread to call functions on GameObjects
+                // Enqueue the received data for processing on the main thread to avoid conflicts with Unity API calls
                 UnityMainThreadDispatcher.Instance.Enqueue(() => signalResponder.ReceiveSignal(data));
             }
         }
     }
 
+    /// <summary>
+    /// Called when the application quits. Releases network resources. 
+    /// </summary>
     void OnApplicationQuit()
     {
         if (client != null)
