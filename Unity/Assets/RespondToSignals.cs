@@ -129,65 +129,65 @@ public class RespondToSignals : MonoBehaviour
                 characterMaterials[i].material.SetTextureOffset("_MainTex", offset);
         }
     }
-}
+
 
     /// <summary>
     /// Handles keyboard inputs for development purposes, allowing manual control over character state changes.
     /// </summary>
     private void HandleKeyboardInputs()
     {
-           if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                ChangeEyeOffset(EyePosition.normal);
-                ChangeAnimatorIdle("idle");
-                ResetOrientation();
-                ResetPosition();
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                ChangeEyeOffset(EyePosition.normal);
-                ChangeAnimatorIdle("point");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                ChangeEyeOffset(EyePosition.happy);
-                ChangeAnimatorIdle("head_nod");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                ChangeEyeOffset(EyePosition.dead);
-                ChangeAnimatorIdle("head_shake");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha5))
-            {
-                ChangeEyeOffset(EyePosition.happy);
-                ChangeAnimatorIdle("clap");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha6))
-            {
-                ChangeEyeOffset(EyePosition.normal);
-                ChangeAnimatorIdle("shrug");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha7))
-            {
-                ChangeEyeOffset(EyePosition.angry);
-                ChangeAnimatorIdle("angry");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha8))
-            {
-                ChangeEyeOffset(EyePosition.happy);
-                ChangeAnimatorIdle("wave");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha9))
-            {
-                ChangeEyeOffset(EyePosition.happy);
-                ChangeAnimatorIdle("excited");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha0))
-            {
-                ChangeEyeOffset(EyePosition.normal);
-                ChangeAnimatorIdle("think");
-            }
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            ChangeEyeOffset(EyePosition.normal);
+            ChangeAnimatorIdle("idle");
+            ResetOrientation();
+            ResetPosition();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            ChangeEyeOffset(EyePosition.normal);
+            ChangeAnimatorIdle("point");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            ChangeEyeOffset(EyePosition.happy);
+            ChangeAnimatorIdle("head_nod");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            ChangeEyeOffset(EyePosition.dead);
+            ChangeAnimatorIdle("head_shake");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            ChangeEyeOffset(EyePosition.happy);
+            ChangeAnimatorIdle("clap");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            ChangeEyeOffset(EyePosition.normal);
+            ChangeAnimatorIdle("shrug");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            ChangeEyeOffset(EyePosition.angry);
+            ChangeAnimatorIdle("angry");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            ChangeEyeOffset(EyePosition.happy);
+            ChangeAnimatorIdle("wave");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            ChangeEyeOffset(EyePosition.happy);
+            ChangeAnimatorIdle("excited");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            ChangeEyeOffset(EyePosition.normal);
+            ChangeAnimatorIdle("think");
+        }
     }
 
     /// <summary>
@@ -231,3 +231,6 @@ public class RespondToSignals : MonoBehaviour
                 break;
         }
     }
+}
+
+    
