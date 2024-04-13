@@ -13,6 +13,9 @@ mp_drawing = mp.solutions.drawing_utils
 model = load_model('python/model.keras')
 
 def prob_viz(res, signals, input_frame):
+    """
+    (For development use - remove for final product.)
+    """
     colors = [(245,117,16), (117,245,16), (16,117,245), (245,117,16), (117,245,16), (16,117,245), (245,117,16), (117,245,16), (16,117,245)]
     output_frame = input_frame.copy()
     for num, prob in enumerate(res):
@@ -21,28 +24,9 @@ def prob_viz(res, signals, input_frame):
         
     return output_frame
 
-def extract_keypoints(results):
-    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-    left_hand = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-    right_hand = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-    
-    return np.concatenate([pose, left_hand, right_hand])
-
-def detect_landmarks(image, holistic):
-    """
-    Process the image using MediaPipe Holistic to extract landmarks.
-    Returns the results which contain the landmarks and image. 
-    """
-    image.flags.writeable = False   
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    results = holistic.process(image)
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
-    return results, image
-    
 def draw_landmarks(image, results):
     """
+    (For development use - remove when completed project.)
     Draw the detected landmarks on the image.
     Adapted from https://github.com/nicknochnack/Body-Language-Decoder/blob/main/Body%20Language%20Decoder%20Tutorial.ipynb
     """
@@ -66,9 +50,71 @@ def draw_landmarks(image, results):
     
     return image
 
+def extract_keypoints(results):
+    """
+    Extracts keypoints from the pose, left hand, and right hand landmarks from the provided results.
+
+    This function processes pose and hand landmarks detected in an image or video frame, converting them into
+    a flat numpy array. If landmarks for a specific part (pose, left hand, right hand) are not found,
+    it fills the respective part of the array with zeros.
+
+    Parameters:
+        results: A result object from MediaPipe Holistic containing various landmark detections.
+
+    Returns:
+        numpy.ndarray: A 1D array containing all the extracted keypoints for pose, left hand, and right hand. 
+                       Each keypoint consists of its x, y, z coordinates, and a visibility score (for pose only).
+                       If no keypoints are detected for a specific part, that segment of the array is filled with zeros.
+                       The pose segment is 132 elements long (33 keypoints * 4 attributes each), and each hand
+                       segment is 63 elements long (21 keypoints * 3 attributes each).
+    """
+    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
+    left_hand = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
+    right_hand = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
+    
+    return np.concatenate([pose, left_hand, right_hand])
+
+def detect_landmarks(image, holistic):
+    """
+    Processes an image to detect and extract landmarks using the MediaPipe Holistic model.
+    
+    Parameters:
+        image: The image in which landmarks are to be detected.
+        holistic: The MediaPipe Holistic model object.
+    
+    Returns:
+        results : An object containing detected landmarks such as pose, face, and hand landmarks.
+        image: The processed image.
+    """
+    image.flags.writeable = False # set to False temporarily to improve performance during processing
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    results = holistic.process(image)
+    image.flags.writeable = True
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+    return results, image
+
+
 def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, use_unity, dev_mode):
     '''
-    Capture live stream from webcam and process frames.
+    Captures video frames from a specified webcam and processes them to detect and interpret social signals,
+    sending recognized signals to Unity.
+
+    The function continuously captures frames from the webcam, uses the MediaPipe Holistic model to detect landmarks
+    in the frames, and analyzes these landmarks to recognize predefined social signals based on keypoints. 
+
+    Parameters:
+        camera_number (int): Index of the webcam to use for capturing video.
+        shutdown_event (threading.Event): Event that signals when the application should terminate.
+        signal_queue (queue.Queue): Queue used for sending signals to Unity in production mode.
+
+    Process:
+        1. Initializes webcam capture and sets up the MediaPipe Holistic model.
+        2. Enters a loop to continuously read frames from the webcam.
+        3. For each frame, detects landmarks and extracts keypoints.
+        4. Uses a sliding window of frames to predict the current signal based on the extracted keypoints using trained model.
+        5. Sends the most common gesture to Unity every three seconds. 
+        6. Checks for a quit command to terminate the capture.
     '''
     # Variables for signal recognition
     sequence = []
@@ -123,7 +169,7 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, use_
                                 # Check if confidence exceeds threshold
                                 if confidence > threshold:
                                     if use_unity:
-                                        # Send signal to Unity
+                                        # Send signal to Unity0
                                         signal_queue.put(most_common_signal)
                                     else:
                                         # Print signal for debugging purposes
