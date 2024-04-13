@@ -61,7 +61,9 @@ public class RespondToSignals : MonoBehaviour
     IEnumerator ReturnToIdle()
     {
         // Wait for a specified time before returning to idle
-        yield return new WaitForSeconds(5);
+        Debug.Log("Starting ReturnToIdle coroutine.");
+        yield return new WaitForSeconds(10);
+        Debug.Log("Completed 10-second wait.");
 
         // Reset position and orientation
         ResetOrientation();

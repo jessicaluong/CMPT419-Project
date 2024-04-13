@@ -1,3 +1,7 @@
+# Structure of Code and Dataset
+
+## TODO 
+
 # Setup 
 ## Install dependencies 
 pip install opencv-python  
@@ -12,7 +16,7 @@ pip install mediapipe==0.10.9
 If your device has one webcam, run 'python3 python/main.py'.  
 Otherwise, you may need to specify the '--camera' flag.  
 Try out different numbers (0, 1, 2, etc.) until you are able to get webcam feed.  
-Run 'python main.py --camera 1' to specify camera.
+Run 'python3 Python/main.py --camera 1 ' to specify camera.
 
 Please note that this starts a webcam capture. The program processes just your coordinates and not your video.  
 
@@ -24,11 +28,15 @@ The virtual agent in Unity will now react to the social signals detected through
 Our agent is able to detect: raise hand, thumbs up, thumbs down, cheering, crossing arms, and clapping. 
 
 ## Step 4. Quit applications
-To quit Python, press 'q' or 'Escape'.  
-To quit Unity, press 'Command-Q' on Mac. 
+To quit Python webcam capture, press 'q' or 'Escape'.  
+To quit Unity application, press 'Command-Q' on Mac. 
+
+# Reflection
+
+## TODO
 
 # For Development Use
 
 ## Unity communication 
-Run ```python main.py --use_unity``` to use Unity communication.  
-Run ```python main.py --use_unity --dev_mode``` to use Unity communication and try out sending signals to Unity through command-line input. 
+Run ```python3 Python/main.py --use_unity``` to use Unity communication.  
+Run ```python3 Python/main.py --dev_mode``` to display recognized signal to screen and print to terminal. 
