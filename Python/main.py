@@ -15,6 +15,25 @@ def send_signals_from_cli(signal_queue, shutdown_event):
             signal_queue.put(sample_signal)  # Add the entered signal to the queue
 
 def main(use_unity=False, camera_number=0, dev_mode=False, cli=False):
+    """
+    Main function to initialize the application based on provided arguments.
+
+    This function handles the setup of threading events and queues, initiates server communication if
+    the application is set to interface with Unity, and starts webcam processing. 
+
+    Parameters:
+        use_unity (bool): If True, establishes a server connection to send data to a Unity application.
+        camera_number (int): Specifies the camera index to use for video capture.
+        dev_mode (bool): If True, enables development mode which may display additional diagnostic
+                         information on the output screen.
+        cli (bool): If True, enables CLI-based interaction for sending signals manually, typically used for debugging.
+
+    Behavior:
+        - Initiates a server connection for Unity if `use_unity` is set to True.
+        - Starts a separate thread for CLI interactions if both `cli` and `use_unity` are True.
+        - Handles webcam video capture and processing in the main thread unless CLI mode is specifically requested.
+        - Waits for threads to complete before closing, particularly the Unity server connection if established.
+    """
     # Threading event to signal server thread to stop
     shutdown_event = threading.Event()
     # Thread-safe queue is shared between webcam processing and server communication
