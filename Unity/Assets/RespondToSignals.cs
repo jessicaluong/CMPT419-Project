@@ -224,7 +224,7 @@ public class RespondToSignals : MonoBehaviour
                 ChangeEyeOffset(EyePosition.happy);
                 ChangeAnimatorIdle("clap");
                 break;
-            case "idle":
+            case "neutral":
                 ChangeEyeOffset(EyePosition.normal);
                 ChangeAnimatorIdle("idle");
                 break;
