@@ -1,14 +1,28 @@
-# Structure of Code and Dataset
+# Setting Up the Project Environment
 
-## TODO 
+To run this project, you may want to set up a Python virtual environment and install the required packages.
 
-# Setup 
-## Install dependencies 
-pip install opencv-python  
-pip install mediapipe
+## Prerequisites
+- Python 3.11.4
 
-For certain Mac devices, may need specific MediaPipe version 0.10.9:   
-pip install mediapipe==0.10.9
+If you would like to build the Unity application yourself:
+- Unity (https://unity.com/download)
+- Unity Account
+
+## Python Setup
+
+Install the required packages: ```pip install -r requirements.txt```
+## Unity Setup for Building Application 
+
+1. Open the Unity Project.
+
+2. Find the Scene under Project/Asset/SimpleNaturePack/Scenes/SimpleNaturePack_Demo.unity. Drag SimpleNaturePack_Demo to Hierarchy. Please delete the default scene under Hierarchy if you plan to build the application. 
+
+3. Under Hierarchy, press Jammo. Under Inspector, ensure the checkboxes of Respond to Signals (Script), Use Tcp Connection, and Unity Client (Script) are checked. 
+
+    a. To run without building the application, press the 'Play' button found in the top-middle of the screen. To stop, press this button again. 
+
+    b. To build application, go to File > Build Settings. Check that the Target Platform and Architecture matches your machine. Press Build and Run. 
 
 # Run Program  
 
@@ -30,6 +44,20 @@ Our agent is able to detect: raise hand, thumbs up, thumbs down, cheering, cross
 ## Step 4. Quit applications
 To quit Python webcam capture, press 'q' or 'Escape'.  
 To quit Unity application, press 'Command-Q' on Mac. 
+
+# Structure of Code and Dataset
+
+Our project is organized into three folders: Python, Unity, and Jupyter. 
+
+## Python folder
+
+
+
+## Unity folder
+
+
+## Jupyter folder 
+
 
 # Reflection
 
