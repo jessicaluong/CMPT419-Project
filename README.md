@@ -218,5 +218,4 @@ We did not conduct a formal human study. Instead, we conducted live interaction 
 # For Development Use
 
 ## Unity communication 
-Run ```python3 Python/main.py --use_unity``` to use Unity communication.  
-Run ```python3 Python/main.py --dev_mode``` to display recognized signal to screen and print to terminal. 
+To run in Development mode: ```python3 Python/main.py --dev_mode```. This does not start the a Unity server. Instead, it prints the recognized signal to the terminal (every 3 seconds if confidence is over 50%), and also draws landmarks and probability of each action to the webcam display.
