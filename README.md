@@ -1,3 +1,11 @@
+# Table of Contents
+1. [System Overview](#overview)
+2. [System Compatibility](#compatibility)
+3. [Project Setup](#setup)
+4. [Self-Evaluation of the Project](#evaluation)
+5. [For Development Use](#dev)
+
+<a name="overview"></a>
 # System Overview
 
 ### Python Components
@@ -14,7 +22,7 @@ Unity functions as the frontend, focusing on visualization and interaction:
 ### Interaction Flow
 The integration between Python and Unity allows Python to handle the heavy lifting of data processing (backend), while Unity focuses on user-facing elements (frontend), making the system efficient and responsive.
 
-## Structure of Code and Dataset
+## Structure of Code and Dataset <a name="structure"></a>
 
 ### Python Folder Structure
 
@@ -77,6 +85,7 @@ Our Jupyter notebooks document the iterative development and testing of our mach
 ### Data Folder Structure 
 TODO: 
 
+<a name="compatibility"></a>
 # System Compatibility
 
 ## Tested Environments 
@@ -93,9 +102,10 @@ This project has been developed and thoroughly tested under the following config
 ## Notes on Compatibility
 
 - **macOS**: The project runs smoothly without any known issues on macOS systems similar to the tested configuration.
-- **Windows**: Some team members have reported issues when running the project on various Windows configurations. We currently do not have a fix for this problem. 
+- **Windows**: Some team members have reported issues when running the project on various Windows configurations. We currently do not have a fix for this problem.
 
-# Project Setup
+<a name="setup"></a>
+# Project Setup 
 
 ## Prerequisites
 
@@ -143,7 +153,8 @@ Before running the Python components of the project, you'll need to install nece
 
 **Note**: The Python backend server must be running before you start the Unity application to ensure proper communication between the TCP client (Unity) and the TCP server (Python).
 
-# Running the Project
+<a name="run"></a>
+# Running the Project 
 
 ### Step 1: Start the Python Application
 Ensure the Python backend is ready to handle data:
@@ -162,7 +173,7 @@ Ensure the Python backend is ready to handle data:
 - To stop the Python webcam capture, press 'q' or 'Escape'.
 - To close the Unity application, press 'Command-Q' on Mac or use the standard window close button if the application is built in Windowed mode.
 
-# Self-Evaluation of the Project
+# Self-Evaluation of the Project <a name="evaluation"></a>
 
 ## Reflection on the Proposal Objectives
 
@@ -215,7 +226,8 @@ We evaluated our model by testing through the Jupyter notebooks, using confusion
 
 We did not conduct a formal human study. Instead, we conducted live interaction sessions with friends and family, who interacted with the system in real-time. This evaluation helped us gauge the system's responsiveness and gather user feedback. We were also able to further assess the model's recognition capabilities this way. 
 
-# For Development Use
+<a name="dev"></a>
+# For Development Use 
 
 ## Unity communication 
 To run in Development mode: ```python3 Python/main.py --dev_mode```. This does not start the a Unity server. Instead, it prints the recognized signal to the terminal (every 3 seconds if confidence is over 50%), and also draws landmarks and probability of each action to the webcam display.
