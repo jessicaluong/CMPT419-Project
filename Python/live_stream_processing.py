@@ -128,16 +128,26 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
     # Predefined social signals
     signals = np.array(['raise_hand', 'thumbs_up', 'thumbs_down', 'cheer', 'cross_arms', 'clap', 'neutral'])
 
-    # Variables for sending signals to Unity every 3 seconds
-    last_sent_time = time.time()  # Initialize the last sent time
-    send_interval = 3  # seconds
+    # Variables for sending signals to Unity every 1 seconds
+    last_sent_time = time.time() # Initialize the last sent timeq
+    send_interval = 2 # seconds
 
     # Use the Holistic model
     with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
         # Opens webcam for video capturing
         cap = cv2.VideoCapture(camera_number)
 
-        try:
+        desired_width = 1280
+        desired_height = 720
+
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, desired_width)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, desired_height)
+
+        actual_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        actual_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        print(f"Actual resolution: {actual_width}x{actual_height}")
+
+        try: 
             while cap.isOpened():
                 ret, frame = cap.read()
 
@@ -176,8 +186,9 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
                                     # Print signal for debugging purposes
                                     print(f"Signal detected: {most_common_signal}")
                                 else:
-                                    # Send signal to Unity0
+                                    # Send signal to Unity
                                     signal_queue.put(most_common_signal)
+                                    print(f"Signal detected: {most_common_signal}")
 
                         # Reset the predictions list and update the last sent time
                         predictions = []
