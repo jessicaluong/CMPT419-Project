@@ -6,11 +6,11 @@ import time
 
 # MediaPipe holistic model to extract landmarks from live stream frames
 # https://github.com/google/mediapipe/blob/master/docs/solutions/holistic.md
-mp_holistic = mp.solutions.holistic 
-# Draw detections to the screen 
+mp_holistic = mp.solutions.holistic
+# Draw detections to the screen
 mp_drawing = mp.solutions.drawing_utils
-# Trained model to classify social signals based on landmarks 
-model = load_model('Python/best_model.keras')
+# Trained model to classify social signals based on landmarks
+model = load_model('Python/model.keras')
 
 def extract_keypoints(results):
     """
@@ -24,7 +24,7 @@ def extract_keypoints(results):
         results: A result object from MediaPipe Holistic containing various landmark detections.
 
     Returns:
-        numpy.ndarray: A 1D array containing all the extracted keypoints for pose, left hand, and right hand. 
+        numpy.ndarray: A 1D array containing all the extracted keypoints for pose, left hand, and right hand.
                        Each keypoint consists of its x, y, z coordinates, and a visibility score (for pose only).
                        If no keypoints are detected for a specific part, that segment of the array is filled with zeros.
                        The pose segment is 132 elements long (33 keypoints * 4 attributes each), and each hand
@@ -33,17 +33,17 @@ def extract_keypoints(results):
     pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
     left_hand = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
     right_hand = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-    
+
     return np.concatenate([pose, left_hand, right_hand])
 
 def detect_landmarks(image, holistic):
     """
     Processes an image to detect and extract landmarks using the MediaPipe Holistic model.
-    
+
     Parameters:
         image: The image in which landmarks are to be detected.
         holistic: The MediaPipe Holistic model object.
-    
+
     Returns:
         results : An object containing detected landmarks such as pose, face, and hand landmarks.
         image: The processed image.
@@ -58,8 +58,8 @@ def detect_landmarks(image, holistic):
 
 def draw_probabilties(res, signals, input_frame):
     """
-    Draw the probabilities of the predefined action being shown by the user on the image. 
-    This function is used in development mode. 
+    Draw the probabilities of the predefined action being shown by the user on the image.
+    This function is used in development mode.
     Adapted from https://github.com/chrisprasanna/Exercise_Recognition_AI/blob/main/ExerciseDecoder.ipynb
     """
     colors = [(245,117,16), (117,245,16), (16,117,245), (245,117,16), (117,245,16), (16,117,245), (245,117,16), (117,245,16), (16,117,245)]
@@ -67,33 +67,33 @@ def draw_probabilties(res, signals, input_frame):
     for num, prob in enumerate(res):
         cv2.rectangle(output_frame, (0,60+num*40), (int(prob*100), 90+num*40), colors[num], -1)
         cv2.putText(output_frame, signals[num], (0, 85+num*40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-        
+
     return output_frame
 
 def draw_landmarks(image, results):
     """
     Draw the detected landmarks on the image.
-    This function is used in development mode. 
+    This function is used in development mode.
     Adapted from https://github.com/nicknochnack/Body-Language-Decoder/blob/main/Body%20Language%20Decoder%20Tutorial.ipynb
     """
     # Right hand
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
                                 mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4),
                                 mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
                                 )
 
     # Left Hand
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
                                 mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4),
                                 mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
                                 )
 
-    # Pose 
-    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS, 
+    # Pose
+    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
                                 mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4),
                                 mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
                                 )
-    
+
     return image
 
 def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_mode):
@@ -102,21 +102,21 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
     sending recognized signals to Unity.
 
     The function continuously captures frames from the webcam, uses the MediaPipe Holistic model to detect landmarks
-    in the frames, and analyzes these landmarks to recognize predefined social signals based on keypoints. 
+    in the frames, and analyzes these landmarks to recognize predefined social signals based on keypoints.
 
     Parameters:
         camera_number (int): Index of the webcam to use for capturing video.
         shutdown_event (threading.Event): Event that signals when the application should terminate.
         signal_queue (queue.Queue): Queue used for sending signals to Unity.
         dev_mode (bool): Flag to indicate whether the application is running in development mode
-                         When set, draws detected landmarks and probability of detected signal to the webcam capture. 
+                         When set, draws detected landmarks and probability of detected signal to the webcam capture.
 
     Process:
         1. Initializes webcam capture and sets up the MediaPipe Holistic model.
         2. Enters a loop to continuously read frames from the webcam.
         3. For each frame, detects landmarks and extracts keypoints.
         4. Uses a sliding window of frames to predict the current signal based on the extracted keypoints using trained model.
-        5. Sends the most common gesture to Unity every three seconds if confidence is above 50%. 
+        5. Sends the most common gesture to Unity every three seconds if confidence is above 50%.
         6. Checks for a quit command to terminate the capture.
     '''
     # Variables for signal recognition
@@ -125,7 +125,7 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
     threshold = 0.5
     sequence_length = 30
 
-    # Predefined social signals 
+    # Predefined social signals
     signals = np.array(['raise_hand', 'thumbs_up', 'thumbs_down', 'cheer', 'cross_arms', 'clap', 'neutral'])
 
     # Variables for sending signals to Unity every 3 seconds
@@ -137,7 +137,7 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
         # Opens webcam for video capturing
         cap = cv2.VideoCapture(camera_number)
 
-        try: 
+        try:
             while cap.isOpened():
                 ret, frame = cap.read()
 
@@ -153,7 +153,7 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
                 keypoints = extract_keypoints(results)
                 sequence.append(keypoints)
                 sequence = sequence[-sequence_length:]
-                
+
                 word = ''
                 res = None
                 if len(sequence) == sequence_length:
@@ -182,20 +182,20 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
                         # Reset the predictions list and update the last sent time
                         predictions = []
                         last_sent_time = current_time
-                    
+
 
                 if dev_mode and res is not None:
                     # Annotate frame with landmarks
                     image = draw_landmarks(image, results)
-                    
+
                     # Annotate frame with probabilities of the predefined action being shown
                     image = draw_probabilties(res, signals, image)
 
                     cv2.rectangle(image, (0,0), (640, 40), (245, 117, 16), -1)
-                    cv2.putText(image, word, (3,30), 
+                    cv2.putText(image, word, (3,30),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-                    
-                # Show the frame with landmarks 
+
+                # Show the frame with landmarks
                 cv2.imshow('Webcam', image)
 
                 # Press 'q' or 'Escape' key to quit
@@ -203,7 +203,7 @@ def capture_and_process_webcam(camera_number, shutdown_event, signal_queue, dev_
                     shutdown_event.set()
                     break
 
-        finally: 
+        finally:
             cap.release()
             cv2.destroyAllWindows()
 

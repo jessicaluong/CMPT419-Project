@@ -7,7 +7,7 @@ import mediapipe as mp
 # VARIABLES YOU MIGHT WANT TO CHANGE
 
 # Path for exported data, numpy arrays
-DATA_PATH = os.path.join('AD_Data')
+DATA_PATH = os.path.join('../data/AD_data')
 
 # Actions that we try to detect
 actions = np.array(['raise_hand', 'thumbs_up', 'thumbs_down', 'cheer', 'cross_arms', 'clap', 'neutral'])
