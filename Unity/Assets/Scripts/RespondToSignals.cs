@@ -18,6 +18,8 @@ public class RespondToSignals : MonoBehaviour
 
     public bool useTcpConnection = true; // Flag to toggle between TCP connection and keyboard input for development purposes
 
+    Coroutine returnToIdleCoroutine;  
+
     /// <summary>
     /// Start is called before the first frame update. Initialize component references and set initial states.
     /// </summary>
@@ -48,11 +50,20 @@ public class RespondToSignals : MonoBehaviour
     {
         if (useTcpConnection)
         {
-            StopCoroutine("ReturnToIdle"); // Stop any existing "ReturnToIdle" coroutine in case a new signal is received before the previous one completes
-            ProcessSignal(signal); // Process the incoming signal.
-            StartCoroutine(ReturnToIdle()); // Start the coroutine to return to the idle state after a delay
+            // Correctly stop the previous coroutine if it's running
+            if (returnToIdleCoroutine != null)
+            {
+                StopCoroutine(returnToIdleCoroutine);
+                returnToIdleCoroutine = null;
+            }
+
+            ProcessSignal(signal);  // Process the incoming signal.
+
+            // Restart the coroutine with a new reference
+            returnToIdleCoroutine = StartCoroutine(ReturnToIdle());
         }
     }
+
 
     /// <summary>
     /// Coroutine to delay before returning to the idle state, resetting position and orientation.
@@ -62,16 +73,16 @@ public class RespondToSignals : MonoBehaviour
     {
         // Wait for a specified time before returning to idle
         Debug.Log("Starting ReturnToIdle coroutine.");
-        yield return new WaitForSeconds(10);
-        Debug.Log("Completed 10-second wait.");
+        yield return new WaitForSeconds(5);
+        Debug.Log("Completed 5-second wait.");
 
-        // Reset position and orientation
-        ResetOrientation();
         ResetPosition();
+        ResetOrientation();
 
         // Transition back to the idle state
         ChangeEyeOffset(EyePosition.normal);
-        ChangeAnimatorIdle("idle");  
+        ChangeAnimatorIdle("idle");
+        Debug.Log("ReturnToIdle completed.");
     }
 
     /// <summary>
@@ -203,14 +214,20 @@ public class RespondToSignals : MonoBehaviour
             case "raise_hand":
                 ChangeEyeOffset(EyePosition.normal);
                 ChangeAnimatorIdle("point");
+                ResetPosition();
+                ResetOrientation();
                 break;
             case "thumbs_up":
                 ChangeEyeOffset(EyePosition.happy);
                 ChangeAnimatorIdle("head_nod");
+                ResetPosition();
+                ResetOrientation();
                 break;
             case "thumbs_down":
                 ChangeEyeOffset(EyePosition.dead);
                 ChangeAnimatorIdle("head_shake");
+                ResetPosition();
+                ResetOrientation();
                 break;
             case "cheer":
                 ChangeEyeOffset(EyePosition.happy);
@@ -227,6 +244,8 @@ public class RespondToSignals : MonoBehaviour
             case "neutral":
                 ChangeEyeOffset(EyePosition.normal);
                 ChangeAnimatorIdle("idle");
+                ResetPosition();
+                ResetOrientation();
                 break;
             default:
                 Debug.LogWarning("Unknown signal received: " + signal);
