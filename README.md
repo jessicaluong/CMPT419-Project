@@ -1,4 +1,10 @@
-# Table of Contents
+<a name="about"></a>
+## About the Project
+A research project on social signal recognition in a classroom environment for fostering engagement.
+
+For more information on the technicalities and approach please read the Project Report.
+
+## Table of Contents
 1. [Project Setup](#setup)
 2. [Running the Project](#run)
 3. [System Compatibility](#compatibility)
@@ -31,28 +37,36 @@ Before running the Python components of the project, you'll need to install nece
 
 ### Step 1: Open the Project
 
-1. Launch Unity and open the project directory. 
+1. Launch Unity and open the unity project directory, `/Unity`. 
+
+<img src="https://github.com/jessicaluong/CMPT419-Project/assets/90084138/a069cc7e-7b50-4c69-ba52-9af2fa103763" width="75%" height="75%">
 
 ### Step 2: Setup Scripts and Components 
 
 1. Configure the Scene: 
     - Navigate to `Project > Assets > SimpleNaturePack > Scenes` and locate the scene named `SimpleNaturePack_Demo`.
+    - <img src="https://github.com/jessicaluong/CMPT419-Project/assets/90084138/d7b7eada-3b1c-41a0-b914-5d336002f1c6" width="75%" height="75%">
     - Drag `SimpleNaturePack_Demo.unity` into the Hierarchy.
+    - <img src="https://github.com/jessicaluong/CMPT419-Project/assets/90084138/3f5aa850-4781-42f1-bafe-e57fa9cf45a2" width="75%" height="75%">
     - Remove any default scenes from the Hierarchy to avoid conflicts.
 
 2. Configure Components: 
-    - Select `Jammo` in the Hierarchy. 
-    - In the Inspector, ensure that the Respond to Signals (Script), Use Tcp Connection, and Unity Client (Script) are checked. 
+    - Select `Jammo` in the Hierarchy.
+    - <img src="https://github.com/jessicaluong/CMPT419-Project/assets/90084138/84dd71ba-efc7-4232-9ca6-06687152eda1" width="75%" height="75%">
+    - In the Inspector, ensure that the Respond to Signals (Script), Use Tcp Connection, and Unity Client (Script) are checked.
+    - <img src="https://github.com/jessicaluong/CMPT419-Project/assets/90084138/a965ae3b-32d6-4e26-abdc-19ec82994487" width="75%" height="75%">
 
 ### Step 3: Running the Project within Unity 
 
 1. Running Within Unity: 
     - Simply press the 'Play' button at the top-middle of the Unity interface to start the application in development mode. This action initiates the client side of the TCP connection. Press the button again to stop.
+    - <img src="https://github.com/jessicaluong/CMPT419-Project/assets/90084138/45bdc13b-646c-4cd2-9500-f1ff32237715" width="75%" height="75%">
 
 2. Building the Application: 
-    - Navigate to `File > Build Settings`.
+    - Navigate to `File > Build Settings` or `Crtl+Shift+B`.
     - Ensure the `Target Platform` and `Architecture` are correctly set for your operating system.
-    - Click `Build and Run` to compile and execute the application. Close the built application after confirming it launches correctly.
+    - Click `Build and Run` and select build directory, to compile and execute the application. Close the built application after confirming it launches correctly.
+    - <img src="https://github.com/jessicaluong/CMPT419-Project/assets/90084138/7f5643f9-3920-4c7f-aa48-04521b954fd0" width="75%" height="75%">
 
 **Note**: The Python backend server must be running before you start the Unity application to ensure proper communication between the TCP client (Unity) and the TCP server (Python).
 
