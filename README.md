@@ -1,12 +1,106 @@
 # Table of Contents
-1. [System Overview](#overview)
-2. [System Compatibility](#compatibility)
-3. [Project Setup](#setup)
-4. [Self-Evaluation of the Project](#evaluation)
-5. [For Development Use](#dev)
+1. [Project Setup](#setup)
+2. [Running the Project](#run)
+3. [System Compatibility](#compatibility)
+4. [System Overview](#overview)
+5. [Self-Evaluation of the Project](#evaluation)
+6. [For Development Use](#dev)
+
+<a name="setup"></a>
+# 1. Project Setup 
+
+## Prerequisites
+
+Ensure you have the following software installed to run the project successfully:
+
+- Python 3.10.9 for Windows
+- Python 3.11.4 for MacOS
+
+For those looking to build or modify the Unity application:
+- Unity: Download and install Unity fron Unity's download page (https://unity.com/download).
+- Unity account: You will need to create a Unity account if you don't already have one. 
+
+## Python Setup
+
+### Install Rquired Packages 
+
+Before running the Python components of the project, you'll need to install necessary libraries:  
+```pip install -r requirements.txt```
+
+## Unity Setup
+
+### Step 1: Open the Project
+
+1. Launch Unity and open the project directory. 
+
+### Step 2: Setup Scripts and Components 
+
+1. Configure the Scene: 
+    - Navigate to `Project > Assets > SimpleNaturePack > Scenes` and locate the scene named `SimpleNaturePack_Demo`.
+    - Drag `SimpleNaturePack_Demo.unity` into the Hierarchy.
+    - Remove any default scenes from the Hierarchy to avoid conflicts.
+
+2. Configure Components: 
+    - Select `Jammo` in the Hierarchy. 
+    - In the Inspector, ensure that the Respond to Signals (Script), Use Tcp Connection, and Unity Client (Script) are checked. 
+
+### Step 3: Running the Project within Unity 
+
+1. Running Within Unity: 
+    - Simply press the 'Play' button at the top-middle of the Unity interface to start the application in development mode. This action initiates the client side of the TCP connection. Press the button again to stop.
+
+2. Building the Application: 
+    - Navigate to `File > Build Settings`.
+    - Ensure the `Target Platform `and Archit`ecture are correctly set for your operating system.
+    - Click `Build and Run` to compile and execute the application. Close the built application after confirming it launches correctly.
+
+**Note**: The Python backend server must be running before you start the Unity application to ensure proper communication between the TCP client (Unity) and the TCP server (Python).
+
+<a name="run"></a>
+# 2. Running the Project 
+
+### Step 1: Start the Python Application
+Ensure that you are in the the project directory `/CMPT419-Project` and that the Python backend is ready to handle data:
+- Run the following command in your terminal:
+  - Windows: `py -3.10 python/main.py`
+  - MacOS: `python3 python/main.py`
+- If you have multiple webcams and need to specify one, use the `--camera` flag. Example: `python3 Python/main.py --camera 1`
+
+**Note**: This starts the webcam capture. The program processes your movements but does not record video.
+
+### Step 2: Start the Unity Application
+- Double-click the built Unity application to start it.
+
+### Step 3: Social Signal Detection
+- The virtual agent in Unity will now react to social signals detected through Python. The agent can detect gestures such as raising a hand, thumbs up, thumbs down, cheering, crossing arms, and clapping.
+
+### Step 4: Quitting the Applications
+- To stop the Python webcam capture, press 'q' or 'Escape'.
+- To close the Unity application, press 'Command-Q' on Mac or use the standard window close button if the application is built in Windowed mode.
+
+<a name="compatibility"></a>
+# 3. System Compatibility
+
+## Tested Environments 
+
+This project has been developed and thoroughly tested under the following configuration:
+
+- **Operating System**: macOS
+  - **Version**: macOS Sonoma 14.2.1
+  - **Hardware**: iMac (Retina 5K, 27-inch, 2020)
+  - **Processor**: 3.8 GHz Quad-Core Intel Core i7
+  - **Memory**: 32 GB 2667 MHz DDR4
+  - **Graphics**: AMD Radeon Pro 5700 XT 16 GB
+ 
+Testing on Windows yet to be done.
+
+## Notes on Compatibility
+
+- **macOS**: The project runs smoothly without any known issues on macOS systems similar to the tested configuration.
+- **Windows**: Some team members have reported issues when running the project on various Windows configurations. We currently do not have a fix for this problem.
 
 <a name="overview"></a>
-# System Overview
+# 4. System Overview
 
 ### Python Components
 Python is utilized as the backend of our system, responsible for:
@@ -63,7 +157,7 @@ Contains essential scripts that drive the virtual agent's behaviors and the appl
 - **UnityClient.cs**: Functions as the TCP client within Unity. It establishes and maintains a network connection with the Python server, processing incoming signals for the agent.
 - **UnityMainThreadDispatcher.cs**: A utility script that facilitates safe calls to Unity’s main thread from asynchronous processes or secondary threads. This is crucial for ensuring smooth and responsive updates to the UI and the agent's animations in real time.
 
-### Jupyter Folder Structure  
+### Notebooks Folder Structure  
 
 Our Jupyter notebooks document the iterative development and testing of our machine learning models, showcasing different approaches and their outcomes. We explored three main approaches and our final model was created through 'ADCreateModel.ipynb'. Below are the key notebooks:
 
@@ -82,98 +176,17 @@ Our Jupyter notebooks document the iterative development and testing of our mach
   - **Details**: Expanded our dataset to include all group members and introduced variations in signal execution to combat overfitting.
   - **Performance**: Showed promising results when tested on group members, though generalization to the external test set highlighted areas for potential improvement.
 
-### Data Folder Structure 
-TODO: 
+### data Folder Structure 
 
-<a name="compatibility"></a>
-# System Compatibility
+Used to store all data used in training and fitting our model.
 
-## Tested Environments 
+- test/:
+  - Purpose: Video test set which inlcudes 2-3 videos for each of our action recognition. Used for evaluation on overfitting.
 
-This project has been developed and thoroughly tested under the following configuration:
+- AD_data/:
+  - Purpose: The default data output location for where data is stored when recording actions in `Notebooks/ADCreateData.ipynb` and read for creating the model in `Notebooks/ADCreateModel.ipynb`.
 
-- **Operating System**: macOS
-  - **Version**: macOS Sonoma 14.2.1
-  - **Hardware**: iMac (Retina 5K, 27-inch, 2020)
-  - **Processor**: 3.8 GHz Quad-Core Intel Core i7
-  - **Memory**: 32 GB 2667 MHz DDR4
-  - **Graphics**: AMD Radeon Pro 5700 XT 16 GB
-
-## Notes on Compatibility
-
-- **macOS**: The project runs smoothly without any known issues on macOS systems similar to the tested configuration.
-- **Windows**: Some team members have reported issues when running the project on various Windows configurations. We currently do not have a fix for this problem.
-
-<a name="setup"></a>
-# Project Setup 
-
-## Prerequisites
-
-Ensure you have the following software installed to run the project successfully:
-
-- Python 3.11.4
-
-For those looking to build or modify the Unity application:
-- Unity: Download and install Unity fron Unity's download page (https://unity.com/download).
-- Unity account: You will need to create a Unity account if you don't already have one. 
-
-## Python Setup
-
-### Install Rquired Packages 
-
-Before running the Python components of the project, you'll need to install necessary libraries:  
-```pip install -r requirements.txt```
-
-## Unity Setup
-
-### Step 1: Open the Project
-
-1. Launch Unity and open the project directory. 
-
-### Step 2: Setup Scripts and Components 
-
-1. Configure the Scene: 
-    - Navigate to `Project > Assets > SimpleNaturePack > Scenes` and locate the scene named `SimpleNaturePack_Demo`.
-    - Drag `SimpleNaturePack_Demo.unity` into the Hierarchy.
-    - Remove any default scenes from the Hierarchy to avoid conflicts.
-
-2. Configure Components: 
-    - Select `Jammo` in the Hierarchy. 
-    - In the Inspector, ensure that the Respond to Signals (Script), Use Tcp Connection, and Unity Client (Script) are checked. 
-
-### Step 3: Running the Project within Unity 
-
-1. Running Within Unity: 
-    - Simply press the 'Play' button at the top-middle of the Unity interface to start the application in development mode. This action initiates the client side of the TCP connection. Press the button again to stop.
-
-2. Building the Application: 
-    - Navigate to `File > Build Settings`.
-    - Ensure the `Target Platform `and Archit`ecture are correctly set for your operating system.
-    - Click `Build and Run` to compile and execute the application. Close the built application after confirming it launches correctly.
-
-**Note**: The Python backend server must be running before you start the Unity application to ensure proper communication between the TCP client (Unity) and the TCP server (Python).
-
-<a name="run"></a>
-# Running the Project 
-
-### Step 1: Start the Python Application
-Ensure the Python backend is ready to handle data:
-- Run the following command in your terminal: `python3 python/main.py`
-- If you have multiple webcams and need to specify one, use the `--camera` flag. Example: `python3 Python/main.py --camera 1`
-
-**Note**: This starts the webcam capture. The program processes your movements but does not record video.
-
-### Step 2: Start the Unity Application
-- Double-click the built Unity application to start it.
-
-### Step 3: Social Signal Detection
-- The virtual agent in Unity will now react to social signals detected through Python. The agent can detect gestures such as raising a hand, thumbs up, thumbs down, cheering, crossing arms, and clapping.
-
-### Step 4: Quitting the Applications
-- To stop the Python webcam capture, press 'q' or 'Escape'.
-- To close the Unity application, press 'Command-Q' on Mac or use the standard window close button if the application is built in Windowed mode.
-
-# Self-Evaluation of the Project <a name="evaluation"></a>
+# 5. Self-Evaluation of the Project <a name="evaluation"></a>
 
 ## Reflection on the Proposal Objectives
 
@@ -227,7 +240,7 @@ We evaluated our model by testing through the Jupyter notebooks, using confusion
 We did not conduct a formal human study. Instead, we conducted live interaction sessions with friends and family, who interacted with the system in real-time. This evaluation helped us gauge the system's responsiveness and gather user feedback. We were also able to further assess the model's recognition capabilities this way. 
 
 <a name="dev"></a>
-# For Development Use 
+# 6. For Development Use 
 
 ## Unity communication 
 To run in Development mode: ```python3 Python/main.py --dev_mode```. This does not start the a Unity server. Instead, it prints the recognized signal to the terminal (every 3 seconds if confidence is over 50%), and also draws landmarks and probability of each action to the webcam display.
