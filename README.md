@@ -62,8 +62,8 @@ Before running the Python components of the project, you'll need to install nece
 ### Step 1: Start the Python Application
 Ensure that you are in the the project directory `/CMPT419-Project` and that the Python backend is ready to handle data:
 - Run the following command in your terminal:
-  - Windows: `py -3.10 python/main.py`
-  - MacOS: `python3 python/main.py`
+  - Windows: `py -3.10 Python/main.py`
+  - MacOS: `python3 Python/main.py`
 - If you have multiple webcams and need to specify one, use the `--camera` flag. Example: `python3 Python/main.py --camera 1`
 
 **Note**: This starts the webcam capture. The program processes your movements but does not record video.
@@ -180,11 +180,11 @@ Our Jupyter notebooks document the iterative development and testing of our mach
 
 Used to store all data used in training and fitting our model.
 
-- test/:
-  - Purpose: Video test set which inlcudes 2-3 videos for each of our action recognition. Used for evaluation on overfitting.
+- test Folder:
+  - Video test set which inlcudes 2-3 videos for each of our action recognition. Used for evaluation on overfitting.
 
-- AD_data/:
-  - Purpose: The default data output location for where data is stored when recording actions in `Notebooks/ADCreateData.ipynb` and read for creating the model in `Notebooks/ADCreateModel.ipynb`.
+- AD_data Folder:
+  - The default output location for where data is stored when recording actions in `Notebooks/ADCreateData.ipynb` and read for creating the model in `Notebooks/ADCreateModel.ipynb`.
 
 # 5. Self-Evaluation of the Project <a name="evaluation"></a>
 
@@ -243,4 +243,4 @@ We did not conduct a formal human study. Instead, we conducted live interaction 
 # 6. For Development Use 
 
 ## Unity communication 
-To run in Development mode: ```python3 Python/main.py --dev_mode```. This does not start the a Unity server. Instead, it prints the recognized signal to the terminal (every 3 seconds if confidence is over 50%), and also draws landmarks and probability of each action to the webcam display.
+To run in Development mode run `Python/main.py` with the `--dev` flag. This does not start the a Unity server. Instead, it prints the recognized signal to the terminal (every 2 seconds if confidence is over 50%), and also draws landmarks and probability of each action to the webcam display.
