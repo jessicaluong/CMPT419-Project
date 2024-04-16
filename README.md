@@ -17,12 +17,12 @@ Ensure you have the following software installed to run the project successfully
 - Python 3.11.4 for MacOS
 
 For those looking to build or modify the Unity application:
-- Unity: Download and install Unity fron Unity's download page (https://unity.com/download).
+- Unity: Download and install Unity from Unity's download page (https://unity.com/download).
 - Unity account: You will need to create a Unity account if you don't already have one. 
 
 ## Python Setup
 
-### Install Rquired Packages 
+### Install Required Packages 
 
 Before running the Python components of the project, you'll need to install necessary libraries:  
 ```pip install -r requirements.txt```
@@ -51,7 +51,7 @@ Before running the Python components of the project, you'll need to install nece
 
 2. Building the Application: 
     - Navigate to `File > Build Settings`.
-    - Ensure the `Target Platform `and Archit`ecture are correctly set for your operating system.
+    - Ensure the `Target Platform` and `Architecture` are correctly set for your operating system.
     - Click `Build and Run` to compile and execute the application. Close the built application after confirming it launches correctly.
 
 **Note**: The Python backend server must be running before you start the Unity application to ensure proper communication between the TCP client (Unity) and the TCP server (Python).
@@ -60,7 +60,7 @@ Before running the Python components of the project, you'll need to install nece
 # 2. Running the Project 
 
 ### Step 1: Start the Python Application
-Ensure that you are in the the project directory `/CMPT419-Project` and that the Python backend is ready to handle data:
+Ensure that you are in the project directory `/CMPT419-Project` and that the Python backend is ready to handle data:
 - Run the following command in your terminal:
   - Windows: `py -3.10 Python/main.py`
   - MacOS: `python3 Python/main.py`
@@ -181,7 +181,7 @@ Our Jupyter notebooks document the iterative development and testing of our mach
 Used to store all data used in training and fitting our model.
 
 - test Folder:
-  - Video test set which inlcudes 2-3 videos for each of our action recognition. Used for evaluation on overfitting.
+  - Video test set, which includes 2-3 videos for each of our action recognition. Used for evaluation on overfitting.
 
 - AD_data Folder:
   - The default output location for where data is stored when recording actions in `Notebooks/ADCreateData.ipynb` and read for creating the model in `Notebooks/ADCreateModel.ipynb`.
@@ -207,13 +207,13 @@ Given the real-time nature of our application, we changed our approach to use LS
 
 The Dense layers following the LSTM architecture serve to interpret the features extracted over time, classifying them into our predefined gesture categories. This approach not only simplified our model architecture but also enhanced its performance by ensuring that the gesture recognition process is both efficient and scalable, adapting seamlessly to the live interaction demands of our system.
 
-By focusing on LSTM and Dense layers, fed by the landmarks detected by MediaPipe, we were able to achieve an effective solution for real-time gesture recognition, which enchances the responsiveness and accuracy of our virtual agent.
+By focusing on LSTM and Dense layers, fed by the landmarks detected by MediaPipe, we were able to achieve an effective solution for real-time gesture recognition, which enhances the responsiveness and accuracy of our virtual agent.
 
 ## Changes to Data Collection
 
 Originally, we planned to use existing datasets, such as EduNet and SCB-dataset. However, as our project progressed, we encountered limitations with these datasets in terms of their applicability to our specific requirements. The pre-existing datasets did not offer the precise control or specificity needed for effective training of our model.
 
-To address these challenges, we opted to create our own dataset from scratch, using live streamed videos of our team members. This approach allowed us to tailor the data collection process to fit exactly the needs of our project, ensuring that each gesture was captured in a controlled environment with consistent camera positioning.
+To address these challenges, we opted to create our own dataset from scratch, using livestreamed videos of our team members. This approach allowed us to tailor the data collection process to fit exactly the needs of our project, ensuring that each gesture was captured in a controlled environment with consistent camera positioning.
 
 The new dataset was designed to include:
 
@@ -243,4 +243,4 @@ We did not conduct a formal human study. Instead, we conducted live interaction 
 # 6. For Development Use 
 
 ## Unity communication 
-To run in Development mode run `Python/main.py` with the `--dev` flag. This does not start the a Unity server. Instead, it prints the recognized signal to the terminal (every 2 seconds if confidence is over 50%), and also draws landmarks and probability of each action to the webcam display.
+To run in Development mode, execute `Python/main.py` with the `--dev` flag. This does not start the a Unity server. Instead, it prints the recognized signal to the terminal (every 2 seconds if confidence is over 50%), and also draws landmarks and probability of each action to the webcam display.
